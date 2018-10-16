@@ -7,6 +7,20 @@
 
 <script>
 export default {
-  '/hello': 'Hello'
+  '/hello': 'Hello',
+  mounted() {
+    this.getCourses()
+  },
+  methods: {
+    getCourses(){
+      this.$axios.get('/api/course')
+                 .then(response=>{
+                   console.log(response)
+                 })
+                 .catch(err=>{
+                   console.log(err)
+                 });
+    }
+  },
 }
 </script>
