@@ -5,7 +5,7 @@
 - `React`
 - `dva`
 
-## requirements
+## Requirements
 - `node`
 - `cnpm` 
 
