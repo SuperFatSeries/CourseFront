@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Skeleton,Card, Button, Icon, List } from 'antd';
 import Link from 'umi/link';
+import router from 'umi/router';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -36,6 +37,7 @@ class CourseList extends PureComponent {
     const {
       course: { list },
       loading,
+      match,
     } = this.props;
 
     const content = (
@@ -46,15 +48,15 @@ class CourseList extends PureComponent {
         <div className={styles.contentLink}>
           <a>
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/MjEImQtenlyueSmVEfUD.svg" />{' '}
-            快速开始
+            -
           </a>
           <a>
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/NbuDUAuBlIApFuDvWiND.svg" />{' '}
-            产品简介
+            -
           </a>
           <a>
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/ohOEPSYdDTNnyMbGuyLb.svg" />{' '}
-            产品文档
+            -
           </a>
         </div>
       </div>
@@ -69,6 +71,7 @@ class CourseList extends PureComponent {
       </div>
     );
         //title={<a href={'course/'+item.id}>{item.name}</a>}
+        //router.push(`${match.url}/`+item.id)
     return (
       <PageHeaderWrapper title="课程列表" content={content} extraContent={extraContent}>
         <div className={styles.cardList}>
@@ -80,9 +83,11 @@ class CourseList extends PureComponent {
               item ? (
                 <List.Item key={item.id}>
                   <Skeleton loading={loading} active>
-                  <Card hoverable className={styles.card} actions={[<a>课件</a>, <a>作业</a>]}>
+                  <Card hoverable className={styles.card} 
+                  actions={[<Link to={'course/'+item.id+'/ware'}>课件</Link>, <Link to={'course/'+item.id+'/homework'}>作业</Link>]}>
                     <Card.Meta
                       avatar={<img alt="" className={styles.cardAvatar} src="" />}
+                      onClick={()=>router.push(`${match.url}/`+item.id)} 
                       title={<Link to={'course/'+item.id}>{item.name}</Link>}
                       description={
                         <Ellipsis className={styles.item} lines={3}>

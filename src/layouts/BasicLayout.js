@@ -21,7 +21,7 @@ import SiderMenu from '@/components/SiderMenu';
 import styles from './BasicLayout.less';
 
 // lazy load SettingDrawer
-const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'));
+//const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'));
 
 const { Content } = Layout;
 
@@ -116,14 +116,14 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
 
     if (!currRouterData) {
-      return 'Ant Design Pro';
+      return 'SFSCourse';
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     });
 
-    return `${pageName} - Ant Design Pro`;
+    return `${pageName} - SFSCourse`;
   };
 
   getLayoutStyle = () => {
@@ -143,6 +143,7 @@ class BasicLayout extends React.PureComponent {
       payload: collapsed,
     });
   };
+  /*
 
   renderSettingDrawer = () => {
     // Do not render SettingDrawer in production
@@ -151,7 +152,7 @@ class BasicLayout extends React.PureComponent {
       return null;
     }
     return <SettingDrawer />;
-  };
+  };*/
 
   render() {
     const {
@@ -214,7 +215,6 @@ class BasicLayout extends React.PureComponent {
             )}
           </ContainerQuery>
         </DocumentTitle>
-        <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense>
       </React.Fragment>
     );
   }

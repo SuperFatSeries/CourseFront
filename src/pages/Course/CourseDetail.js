@@ -5,23 +5,21 @@ import Link from 'umi/link';
 import router from 'umi/router';
 import { Row, Col, Card, List, Avatar,Icon,Spin} from 'antd';
 
-import { Radar } from '@/components/Charts';
+//import { Radar } from '@/components/Charts';
 import EditableLinkGroup from '@/components/EditableLinkGroup';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './CourseDetail.less';
+import { returnAtIndex } from '_lodash-decorators@6.0.1@lodash-decorators/utils';
 
-@connect(({ course,user, project, activities, chart, loading }) => ({
+@connect(({ course, homework, notification, loading }) => ({
   course,
   loading: loading.models.course,
   listLoading: loading.effects['list/fetch'],
-  currentUser: user.currentUser,
-  project,
-  activities,
-  chart,
-  currentUserLoading: loading.effects['user/fetchCurrent'],
-  projectLoading: loading.effects['project/fetchNotice'],
-  activitiesLoading: loading.effects['activities/fetchList'],
+  homework,
+  notification,
+  //chart,
+  notificationLoading: loading.effects['notification/fetchList'],
 }))
 class CourseDetail extends PureComponent {
   state = {
@@ -41,24 +39,53 @@ class CourseDetail extends PureComponent {
         size: 10
       },
     });
+
+    
     dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'list/fetch',
+      type: 'course/queryCourseInfo',
       payload: {
-        count: 8,
+        courseId: this.props.match.params.courseId,
+        page: 0,
+        size: 10
       },
     });
+    
     dispatch({
-      type: 'project/fetchNotice',
+      type: 'homework/queryHomeworkList',
+      payload: {
+        courseId: this.props.match.params.courseId,
+        page: 0,
+        size: 10
+      },
     });
+    
     dispatch({
-      type: 'activities/fetchList',
+      type: 'notification/queryNotificationList',
+      payload: {
+        courseId: this.props.match.params.courseId,
+        page: 0,
+        size: 10
+      },
     });
-    dispatch({
-      type: 'chart/fetch',
-    });
+    
+    //dispatch({
+    //  type: 'user/fetchCurrent',
+    //});
+    //dispatch({
+    //  type: 'list/fetch',
+    //  payload: {
+    //    count: 8,
+    //  },
+    //});
+    //dispatch({
+    //  type: 'project/fetchNotice',
+    //});
+    //dispatch({
+    //  type: 'notification/fetchList',
+    //});
+    //dispatch({
+    //  type: 'chart/fetch',
+    //});
     const { match } = this.props;
     console.log(location.pathname.replace(location.pathname.substring(0,location.pathname.lastIndexOf("\/")+1),''));
     console.log(location.pathname.replace(`${match.path}/`, ''));
@@ -85,40 +112,60 @@ class CourseDetail extends PureComponent {
 
   componentWillUnmount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'chart/clear',
-    });
+    //dispatch({
+    //  type: 'chart/clear',
+    //});
   }
 
-  renderActivities() {
+  renderHomeworkNotDLLList() {
     const {
-      activities: { list },
+      homework: { list },
+    } = this.props;
+    console.log('renderHomeworkNotDLLList:'+list)
+    return list ? list.map(item => {
+      return (
+        <Card.Grid className={styles.projectGrid} key={item.id}>
+          <Card bodyStyle={{ padding: 0 }} bordered={false}>
+            <Card.Meta
+              title={
+                <div className={styles.cardTitle}>
+                  <Link to={"/course/"+this.props.match.params.courseId+"/homework"} >{item.name}</Link>
+                </div>
+              }
+              description={item.requirement}
+            />
+            <div className={styles.projectItemContent}>
+              <Link to={"/course/"+this.props.match.params.courseId+"/homework"} >{item.member || ''}</Link>
+              {item.last_modified_time && (
+                <span className={styles.datetime} title={item.last_modified_time}>
+                  {moment(item.last_modified_time).fromNow()}
+                </span>
+              )}
+            </div>
+          </Card>
+        </Card.Grid>
+      )
+    } ) : null;
+  }
+
+  renderNotification() {
+    const {
+      notification: { list },
     } = this.props;
     return list.map(item => {
-      const events = item.template.split(/@\{([^{}]*)\}/gi).map(key => {
-        if (item[key]) {
-          return (
-            <a href={item[key].link} key={item[key].name}>
-              {item[key].name}
-            </a>
-          );
-        }
-        return key;
-      });
       return (
         <List.Item key={item.id}>
           <List.Item.Meta
-            avatar={<Avatar src={item.user.avatar} />}
             title={
               <span>
-                <a className={styles.username}>{item.user.name}</a>
+                <a className={styles.username}>{item.title}</a>
                 &nbsp;
-                <span className={styles.event}>{events}</span>
+                <span className={styles.event}>{item.content}</span>
               </span>
             }
             description={
-              <span className={styles.datetime} title={item.updatedAt}>
-                {moment(item.updatedAt).fromNow()}
+              <span className={styles.datetime} title={item.last_modified_time}>
+                {moment(item.last_modified_time).fromNow()}
               </span>
             }
           />
@@ -127,27 +174,44 @@ class CourseDetail extends PureComponent {
     });
   }
 
+  renderHeaderExtra() {
+    const{course: { info }
+    } = this.props;
+    
+    return (
+    <div>
+      <div className={styles.statItem}>
+        <p>课件</p>
+        <p>{info.courseware_count}</p>
+      </div>
+      <div className={styles.statItem}>
+        <p>作业</p>
+        <p>
+         {info.dated_count} <span> / {info.homework_count}</span>
+        </p>
+      </div>
+      <div className={styles.statItem}>
+        <p>提交次数</p>
+        <p>{info.submit_count}</p>
+      </div>
+    </div>);
+  }
+
   render() {
     const {
       course: { data },
       listLoading,
       currentUser,
       currentUserLoading,
-      project: { notice },
-      projectLoading,
-      activitiesLoading,
-      chart: { radarData },
+      notificationLoading,
+      //chart: { radarData },
       match,
       location,
       children,
     } = this.props;
 
-    const pageHeaderContent =
-      currentUser && Object.keys(currentUser).length ? (
+    const pageHeaderContent = (
         <div className={styles.pageHeaderContent}>
-          <div className={styles.avatar}>
-            <Avatar size="large" src={currentUser.avatar} />
-          </div>
           <div className={styles.content}>
             <div className={styles.contentTitle}>
               《{data.name}》
@@ -156,24 +220,11 @@ class CourseDetail extends PureComponent {
             </div>
           </div>
         </div>
-      ) : null;
+      );
 
     const extraContent = (
       <div className={styles.extraContent}>
-        <div className={styles.statItem}>
-          <p>项目数</p>
-          <p>56</p>
-        </div>
-        <div className={styles.statItem}>
-          <p>团队内排名</p>
-          <p>
-            8<span> / 24</span>
-          </p>
-        </div>
-        <div className={styles.statItem}>
-          <p>项目访问</p>
-          <p>2,223</p>
-        </div>
+        {this.renderHeaderExtra()}
       </div>
     );
 
@@ -231,43 +282,21 @@ class CourseDetail extends PureComponent {
               style={{ marginBottom: 24 }}
               title="进行中的作业"
               bordered={false}
-              extra={<Link to="/">全部项目</Link>}
-              loading={projectLoading}
+              extra={<Link to="/">全部作业</Link>}
+              loading={notificationLoading}
               bodyStyle={{ padding: 0 }}
             >
-              {notice.map(item => (
-                <Card.Grid className={styles.projectGrid} key={item.id}>
-                  <Card bodyStyle={{ padding: 0 }} bordered={false}>
-                    <Card.Meta
-                      title={
-                        <div className={styles.cardTitle}>
-                          <Avatar size="small" src={item.logo} />
-                          <Link to={item.href}>{item.title}</Link>
-                        </div>
-                      }
-                      description={item.description}
-                    />
-                    <div className={styles.projectItemContent}>
-                      <Link to={item.memberLink}>{item.member || ''}</Link>
-                      {item.updatedAt && (
-                        <span className={styles.datetime} title={item.updatedAt}>
-                          {moment(item.updatedAt).fromNow()}
-                        </span>
-                      )}
-                    </div>
-                  </Card>
-                </Card.Grid>
-              ))}
+            {this.renderHomeworkNotDLLList()}
             </Card>
             <Card
               bodyStyle={{ padding: 0 }}
               bordered={false}
               className={styles.activeCard}
               title="通知"
-              loading={activitiesLoading}
+              loading={notificationLoading}
             >
-              <List loading={activitiesLoading} size="large">
-                <div className={styles.activitiesList}>{this.renderActivities()}</div>
+              <List loading={notificationLoading} size="large">
+                <div className={styles.activitiesList}>{this.renderNotification()}</div>
               </List>
             </Card>
           </Col>

@@ -1,4 +1,4 @@
-import { queryCourseList, queryCourseDetail,queryCourseInfo,downloadCourseware,queryCoursewareList,queryHomeworkList,queryFakeList, removeFakeList, addFakeList, updateFakeList } from '@/services/api';
+import { queryCourseList, queryCourseDetail,queryCourseInfo,downloadCourseware,queryCoursewareList,queryHomeworkList,queryHomeworkSubmitList,queryFakeList, removeFakeList, addFakeList, updateFakeList } from '@/services/api';
 
 export default {
   namespace: 'course',
@@ -6,6 +6,7 @@ export default {
   state: {
     list: [],
     data: [],
+    info: [],
   },
 
   effects: {
@@ -26,7 +27,7 @@ export default {
     *queryCourseInfo({ payload }, { call, put }){
       const response = yield call(queryCourseInfo,payload);
       yield put({
-        type: 'queryData',
+        type: 'queryInfo',
         payload: response.data,
       });
     },
@@ -46,6 +47,14 @@ export default {
       });
     },
     *queryHomeworkList({ payload }, { call, put }){
+      const response = yield call(queryHomeworkList,payload);
+      console.log(response.data.content);
+      yield put({
+        type: 'queryList',
+        payload: Array.isArray(response.data.content) ? response.data.content : [],
+      });
+    },
+    *queryHomeworkSubmitList({ payload }, { call, put }){
       const response = yield call(queryHomeworkList,payload);
       console.log(response.data.content);
       yield put({
@@ -94,6 +103,12 @@ export default {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    queryInfo(state, action) {
+      return {
+        ...state,
+        info: action.payload,
       };
     },
     appendList(state, action) {

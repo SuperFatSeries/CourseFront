@@ -12,7 +12,7 @@ export async function queryCourseDetail(params){
 }
 export async function queryCourseInfo(params){
   const { courseId = 1, ...restParams } = params;
-  return request('/server/api/course/'+courseId);
+  return request('/server/api/course/'+courseId+'/info');
 }
 export async function queryCoursewareList(params){
   const { courseId = 1, ...restParams } = params;
@@ -22,6 +22,10 @@ export async function downloadCourseware(params){
   const { courseId = 1,coursewareId = 1, ...restParams } = params;
   return request('/server/api/course/'+courseId+'/ware/'+coursewareId+'/download');
 }
+export async function queryHomeworkDetail(params){
+  const { courseId = 1, homeworkId = 1, ...restParams } = params;
+  return request('/server/api/course/'+courseId+'/homework/'+homeworkId);
+}
 export async function queryHomeworkList(params){
   const { courseId = 1, ...restParams } = params;
   return request('/server/api/course/'+courseId+'/homework');
@@ -30,6 +34,26 @@ export async function queryHomeworkSubmitList(params){
   const { courseId = 1, homeworkId = 1, ...restParams } = params;
   return request('/server/api/course/'+courseId+'/homework/'+homeworkId+'/submit');
 }
+
+export async function queryNotificationList(params){
+  const { courseId = 1, ...restParams } = params;
+  return request('/server/api/course/'+courseId+'/notification');
+}
+
+//-------------------------------------------------
+/*
+    headers: {
+      "content-type": 'multipart/form-data;'
+    },*/
+export async function postHomeworkSubmit(params){
+  const { courseId = 1, homeworkId = 1, sdata, ...restParams } = params;
+  console.log('sdata = '+sdata)
+  return request('/server/api/course/'+courseId+'/homework/'+homeworkId+'/submit',{
+    method: 'put',
+    body: sdata
+  });
+}
+
 
 //-------------------------------------------------
 

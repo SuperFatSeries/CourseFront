@@ -31,8 +31,7 @@ export default class TopNavHeader extends PureComponent {
           <div className={styles.left}>
             <div className={styles.logo} key="logo" id="logo">
               <Link to="/">
-                <img src={logo} alt="logo" />
-                <h1>Ant Design Pro</h1>
+                <h1>SFSCourse</h1>
               </Link>
             </div>
             <div
@@ -43,7 +42,6 @@ export default class TopNavHeader extends PureComponent {
               <BaseMenu {...this.props} flatMenuKeys={flatMenuKeys} className={styles.menu} />
             </div>
           </div>
-          <RightContent {...this.props} />
         </div>
       </div>
     );

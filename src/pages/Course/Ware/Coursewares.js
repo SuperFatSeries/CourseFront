@@ -211,7 +211,7 @@ class Coursewares extends PureComponent {
                   paragraph={skeletonParagraphProps}
                   >
                     <List.Item.Meta
-                      title={<a href={"http://127.0.0.1:8000/server/api/course/"+this.props.match.params.courseId+"/ware/"+item.id+"/download"}>{item.file_name}</a>}
+                      title={<a href={"http://192.168.199.110:8088/course/"+this.props.match.params.courseId+"/ware/"+item.id+"/download"}>{item.file_name}</a>}
                       description={item.remark}
                     />
                     <ListContent data={item} />
