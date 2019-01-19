@@ -1,11 +1,9 @@
 # CourseFront
-using @vue/cli element-ui
-vue element-ui
-requirements:
+using Ant Design Pro 
+react
+requirements: cnpm
 use:
 ```
-cd src
-npm i @vue/cli -g
-npm i element-ui -S
-npm run serve
+npm i
+npm start
 ```
